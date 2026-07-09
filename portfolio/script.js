@@ -1,25 +1,55 @@
 /**
- * Morgan Vance | BBA Portfolio Interactivity & Live Strategy Ledger
+ * Joyanta Bhowmick | BBA Portfolio Interactivity & Live Strategy Ledger
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // Theme Switcher & Mobile Menu
+    // Theme Switcher (System Preference + Local Storage)
     // ----------------------------------------------------
     const themeToggle = document.getElementById('themeToggle');
     const menuToggle = document.getElementById('menuToggle');
     const navMenu = document.getElementById('navMenu');
 
-    // Set system/default theme
-    let currentTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', currentTheme);
+    // Function to apply theme
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
 
+    // Function to determine initial theme
+    function getInitialTheme() {
+        // 1. Check local storage first
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            return savedTheme;
+        }
+        // 2. Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return prefersDark ? 'dark' : 'light';
+    }
+
+    // Initialize theme
+    let currentTheme = getInitialTheme();
+    applyTheme(currentTheme);
+
+    // Toggle theme manually
     themeToggle.addEventListener('click', () => {
         const targetTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', targetTheme);
+        applyTheme(targetTheme);
         localStorage.setItem('theme', targetTheme);
     });
 
+    // Listen for system preference changes and update if user hasn't overridden
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        // Only update if there is no manual override saved in localStorage
+        if (!localStorage.getItem('theme')) {
+            const targetTheme = e.matches ? 'dark' : 'light';
+            applyTheme(targetTheme);
+        }
+    });
+
+    // ----------------------------------------------------
+    // Mobile Navigation Menu Toggle
+    // ----------------------------------------------------
     menuToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         menuToggle.classList.toggle('active');
@@ -62,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------
-    // Tabbed Case Studies Interface
+    // Tabbed Case Studies / Achievements Interface
     // ----------------------------------------------------
     const tabButtons = document.querySelectorAll('.tab-btn');
     const casePanels = document.querySelectorAll('.case-panel');
@@ -97,15 +127,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             skillCards.forEach(card => {
                 const category = card.getAttribute('data-category');
-                if (targetFilter === 'all' || category === targetFilter) {
-                    card.style.display = 'flex';
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'scale(1)';
-                    }, 50);
-                } else {
-                    card.style.display = 'none';
+                // Use a default category 'other' if no category is specified (e.g. extracurricular activity cards)
+                if (category) {
+                    if (targetFilter === 'all' || category === targetFilter) {
+                        card.style.display = 'flex';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 50);
+                    } else {
+                        card.style.display = 'none';
+                    }
                 }
             });
         });
@@ -280,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Perform mock dispatch API request
         formFeedback.className = 'form-feedback success';
-        formFeedback.textContent = `Thank you, ${name}. Your strategic inquiry focusing on "${subject}" has been queued. Morgan will connect with you shortly at ${email}.`;
+        formFeedback.textContent = `Thank you, ${name}. Your strategic inquiry focusing on "${subject}" has been queued. Joyanta will connect with you shortly at ${email}.`;
 
         // Reset form controls
         contactForm.reset();
